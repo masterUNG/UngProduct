@@ -6,10 +6,17 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  final formKey = GlobalKey<FormState>();
+
   Widget uploadButton() {
     return IconButton(
-      icon: Icon(Icons.cloud_upload, size: 30.0,),
-      onPressed: () {},
+      icon: Icon(
+        Icons.cloud_upload,
+        size: 30.0,
+      ),
+      onPressed: () {
+        if (formKey.currentState.validate()) {}
+      },
     );
   }
 
@@ -28,7 +35,13 @@ class _RegisterState extends State<Register> {
             helperText: 'Type Your Display Name',
             labelStyle: TextStyle(color: Colors.green[400]),
             helperStyle: TextStyle(color: Colors.yellow[800]),
+            errorStyle: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
           ),
+          validator: (String value) {
+            if (value.length == 0) {
+              return 'Please Fill in Blank Name';
+            }
+          },
         ),
       ),
     );
@@ -50,6 +63,7 @@ class _RegisterState extends State<Register> {
             labelStyle: TextStyle(color: Colors.green[400]),
             helperStyle: TextStyle(color: Colors.yellow[800]),
           ),
+          validator: (String value) {},
         ),
       ),
     );
@@ -85,17 +99,20 @@ class _RegisterState extends State<Register> {
         title: Text('Register'),
         actions: <Widget>[uploadButton()],
       ),
-      body: Container(
-        alignment: Alignment(0, -1),
-        padding: EdgeInsets.only(top: 50.0),
+      body: Form(
+        key: formKey,
         child: Container(
-          width: 250.0,
-          child: Column(
-            children: <Widget>[
-              nameTextFormField(),
-              emailTextFormField(),
-              passwordTextFormField(),
-            ],
+          alignment: Alignment(0, -1),
+          padding: EdgeInsets.only(top: 50.0),
+          child: Container(
+            width: 250.0,
+            child: Column(
+              children: <Widget>[
+                nameTextFormField(),
+                emailTextFormField(),
+                passwordTextFormField(),
+              ],
+            ),
           ),
         ),
       ),
