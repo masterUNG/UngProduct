@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ungproduct/screens/register.dart';
 
 class Authen extends StatefulWidget {
   @override
@@ -55,7 +56,8 @@ class _AuthenState extends State<Authen> {
       alignment: Alignment(0, -1),
       child: Container(
         width: 250.0,
-        child: TextFormField(obscureText: true,
+        child: TextFormField(
+          obscureText: true,
           decoration: InputDecoration(
             icon: Icon(
               Icons.lock,
@@ -87,7 +89,7 @@ class _AuthenState extends State<Authen> {
     );
   }
 
-  Widget signUpButton() {
+  Widget signUpButton(BuildContext context) {
     return Expanded(
       child: OutlineButton(
         borderSide: BorderSide(
@@ -99,14 +101,20 @@ class _AuthenState extends State<Authen> {
           'Sign Up',
           style: TextStyle(color: Colors.green[800]),
         ),
-        onPressed: () {},
+        onPressed: () {
+          print('Click Sign Up');
+          var routeRegister =
+              MaterialPageRoute(builder: (BuildContext context) => Register());
+              Navigator.of(context).push(routeRegister);
+        },
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(resizeToAvoidBottomPadding: false,
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
       body: Container(
         decoration: BoxDecoration(
           gradient: RadialGradient(
@@ -123,12 +131,16 @@ class _AuthenState extends State<Authen> {
             showAppName(),
             emailTextFormField(),
             passwordTextFormField(),
-            Container(margin: EdgeInsets.only(top: 10.0),
+            Container(
+              margin: EdgeInsets.only(top: 10.0),
               alignment: Alignment(0, -1),
               child: Container(
                 width: 250.0,
                 child: Row(
-                  children: <Widget>[signInButton(), signUpButton()],
+                  children: <Widget>[
+                    signInButton(),
+                    signUpButton(context),
+                  ],
                 ),
               ),
             ),
