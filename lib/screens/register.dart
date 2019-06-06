@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:ungproduct/screens/product_list_view.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -9,9 +11,10 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   final formKey = GlobalKey<FormState>();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final FirebaseDatabase firebaseDatabase = FirebaseDatabase.instance;
   String name, email, password;
 
-  Widget uploadButton() {
+  Widget uploadButton(BuildContext context) {
     return IconButton(
       icon: Icon(
         Icons.cloud_upload,
@@ -20,20 +23,46 @@ class _RegisterState extends State<Register> {
       onPressed: () {
         if (formKey.currentState.validate()) {
           formKey.currentState.save();
-          uploadValueToFirebase();
+          uploadValueToFirebase(context);
         }
       },
     );
   }
 
-  void uploadValueToFirebase() async {
+  void uploadValueToFirebase(BuildContext conetxt) async {
     print('name = $name, email = $email, password = $password');
     await firebaseAuth
         .createUserWithEmailAndPassword(email: email, password: password)
         .then((value) {
-      print('Upload Success');
+      String uid = value.uid.toString();
+      print('uid ==> $uid');
+      updateUserToFirebase(uid, conetxt);
     }).catchError((String error) {
       print('Error ==> $error');
+    });
+  }
+
+  void updateUserToFirebase(String uidString, BuildContext context) async {
+    Map<String, String> map = Map();
+    map['Name'] = name;
+    map['Email'] = email;
+    map['Uid'] = uidString;
+
+    await firebaseDatabase
+        .reference()
+        .child('User')
+        .child(uidString)
+        .set(map)
+        .then((value) {
+      print('Update Success');
+
+      // Create Route WithOut ArrowBack
+      var productRoute = MaterialPageRoute(
+          builder: (BuildContext context) => ProductListView());
+      Navigator.of(context)
+          .pushAndRemoveUntil(productRoute, (Route<dynamic> route) => false);
+    }).catchError((String error) {
+      print('Error on up Database ==>>> $error');
     });
   }
 
@@ -132,7 +161,7 @@ class _RegisterState extends State<Register> {
       appBar: AppBar(
         backgroundColor: Colors.green[800],
         title: Text('Register'),
-        actions: <Widget>[uploadButton()],
+        actions: <Widget>[uploadButton(context)],
       ),
       body: Form(
         key: formKey,
