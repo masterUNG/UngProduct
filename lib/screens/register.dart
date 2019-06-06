@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -7,6 +8,8 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   final formKey = GlobalKey<FormState>();
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  String name, email, password;
 
   Widget uploadButton() {
     return IconButton(
@@ -15,9 +18,23 @@ class _RegisterState extends State<Register> {
         size: 30.0,
       ),
       onPressed: () {
-        if (formKey.currentState.validate()) {}
+        if (formKey.currentState.validate()) {
+          formKey.currentState.save();
+          uploadValueToFirebase();
+        }
       },
     );
+  }
+
+  void uploadValueToFirebase() async {
+    print('name = $name, email = $email, password = $password');
+    await firebaseAuth
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .then((value) {
+      print('Upload Success');
+    }).catchError((String error) {
+      print('Error ==> $error');
+    });
   }
 
   Widget nameTextFormField() {
@@ -42,6 +59,9 @@ class _RegisterState extends State<Register> {
               return 'Please Fill in Blank Name';
             }
           },
+          onSaved: (String value) {
+            name = value;
+          },
         ),
       ),
     );
@@ -63,7 +83,14 @@ class _RegisterState extends State<Register> {
             labelStyle: TextStyle(color: Colors.green[400]),
             helperStyle: TextStyle(color: Colors.yellow[800]),
           ),
-          validator: (String value) {},
+          validator: (String value) {
+            if (!((value.contains('@')) && (value.contains('.')))) {
+              return 'Please Email Format you@email.com';
+            }
+          },
+          onSaved: (String value) {
+            email = value;
+          },
         ),
       ),
     );
@@ -85,6 +112,14 @@ class _RegisterState extends State<Register> {
             labelStyle: TextStyle(color: Colors.green[400]),
             helperStyle: TextStyle(color: Colors.yellow[800]),
           ),
+          validator: (String value) {
+            if (value.length <= 5) {
+              return 'Password Mush More 6 Charactor';
+            }
+          },
+          onSaved: (String value) {
+            password = value;
+          },
         ),
       ),
     );
