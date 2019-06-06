@@ -11,16 +11,17 @@ class Authen extends StatefulWidget {
 class _AuthenState extends State<Authen> {
   final formKey = GlobalKey<FormState>();
   String email, password;
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
-    // checkStatus(context);
+    checkStatus(context);
   }
 
   void checkStatus(BuildContext context) async {
-    FirebaseAuth firebaseAuth = await FirebaseAuth.instance;
-    if (firebaseAuth.currentUser() != null) {
+    FirebaseUser firebaseUser = await firebaseAuth.currentUser();
+    if (firebaseUser != null) {
       setState(() {
         print('Login');
         moveToProduct(context);
